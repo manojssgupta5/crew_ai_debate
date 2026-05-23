@@ -1,0 +1,80 @@
+propose:
+  description: >
+    You are proposing the motion: {motion}.
+    use the web_search_tool to verify claims and find the latest
+    facts, expert opinions, and recent developments before building your argument.
+    Use findings to create a strong supporting argument.
+  expected_output: >
+    Strong supporting argument backed by verified research.
+  agent: debater_favor
+  output_file: output/propose.md
+
+propose_validation:
+  description: >
+    Review the supporting argument for the motion.
+    Identify weak reasoning, unclear framing,
+    contradictions, logical gaps, or missing evidence.
+    Then improve and finalize the argument yourself.
+    Only return the final improved version once the
+    argument is strong and convincing enough to proceed.
+  expected_output: >
+    Final validated supporting argument.
+  agent: debater_favor_validation
+  context:
+    - propose
+  output_file: output/propose_validation.md
+
+oppose:
+  description: >
+    You oppose the motion: {motion}.
+    use the web_search_tool to verify claims and find the latest
+    facts, expert opinions, and recent developments before building your argument.
+    Use findings to create a strong supporting argument.
+  expected_output: >
+    Strong opposing argument.
+  agent: debater_against
+  context:
+    - propose_validation  
+  output_file: output/oppose.md
+
+oppose_validation:
+  description: >
+    Review the opposing argument.
+    Identify weak reasoning, contradictions,
+    weak rebuttals, or unclear framing. Then improve and finalize the argument yourself.
+    Only return the final improved opposing argument
+    once it is strong and convincing enough to proceed.
+  expected_output: >
+    Final validated opposing argument.
+  agent: debater_against_validation
+  context:
+    - oppose
+    - propose_validation
+  output_file: output/oppose_validation.md
+
+decide:
+  description: >
+    Compare the validated supporting and opposing arguments.
+    Decide which side is more convincing and explain why.
+  expected_output: >
+    Final verdict with reasoning.
+  agent: judge
+  context:
+    - propose_validation
+    - oppose_validation
+  output_file: output/decide.md
+
+send_email:
+  description: >
+    Send the final debate result email to:
+    [EMAIL_ADDRESS](mailto:[EMAIL_ADDRESS])
+    Include:
+    - winning side
+    - summary of both arguments
+    - final judge reasoning
+    Use the SendGrid Email Tool.
+  expected_output: >
+    Confirmation that the email was sent successfully.
+  agent: sender
+  context:
+    - decide
